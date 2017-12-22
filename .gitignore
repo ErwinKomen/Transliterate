@@ -243,3 +243,10 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/Chechen/__pycache__
+/Lezgi/Latin_Text1.txt
+/Lezgi/Text1.txt
+/Chechen/Chechen.spec
+*.pyc
+/Transliterate.sln
+/Chechen/TranslitChe/
