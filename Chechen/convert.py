@@ -202,8 +202,9 @@ def do_convert(sPart):
     sPart = re.sub(r"[Ww]", r"ʕ",sPart)
     # Treat double glottal stop
     sPart = sPart.replace("''", "ʔː")
+    sPart = sPart.replace("’’", "ʔː")
     # Treat single glottal stop
-    sPart = re.sub(r"([aeiuoy])(')", r"\g<1>ʔ", sPart)
+    sPart = re.sub(r"([aeiuoy])(['’])", r"\g<1>ʔ", sPart)
     # Treat [rh]
     sPart = sPart.replace("rh", "r̥")
 

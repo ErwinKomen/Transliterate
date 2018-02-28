@@ -12,10 +12,10 @@
     <OutputPath>.</OutputPath>
     <Name>Chechen</Name>
     <RootNamespace>Chechen</RootNamespace>
-    <InterpreterId>{635a10d7-ea0d-4f11-9219-167bcc6e3dc8}</InterpreterId>
+    <InterpreterId>{7c896e65-00f1-457e-b5b8-04fb4a19f42e}</InterpreterId>
     <InterpreterVersion>3.5</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>-i "d:/data files/publications/CaucasianHandbook/2017_CaucHbk-Chechen_converted-11.docx" -o "d:/data files/publications/CaucasianHandbook/2017_CaucHbk-Chechen_converted-11_conv.docx" -t PhonemicCaucHandbookItalic</CommandLineArguments>
+    <CommandLineArguments>-i "d:/data files/publications/CaucasianHandbook/2017_CaucHbk-Chechen_converted-07-12.docx" -o "d:/data files/publications/CaucasianHandbook/2017_CaucHbk-Chechen_converted-07-12_conv.docx" -t PhonemicCaucHandbookItalic</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -37,15 +37,15 @@
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="..\..\..\..\..\env\transliterate\">
-      <Id>{635a10d7-ea0d-4f11-9219-167bcc6e3dc8}</Id>
-      <BaseInterpreter>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</BaseInterpreter>
+      <Id>{7c896e65-00f1-457e-b5b8-04fb4a19f42e}</Id>
+      <BaseInterpreter>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</BaseInterpreter>
       <Version>3.5</Version>
-      <Description>transliterate (Python 64-bit 3.5)</Description>
+      <Description>transliterate (Python 3.5)</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
       <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
       <LibraryPath>Lib\</LibraryPath>
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
-      <Architecture>Amd64</Architecture>
+      <Architecture>X86</Architecture>
     </Interpreter>
   </ItemGroup>
   <PropertyGroup>
