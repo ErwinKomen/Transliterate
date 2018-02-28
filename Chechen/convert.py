@@ -18,10 +18,16 @@ def academic2phonemic(options):
     # Make sure we have an error object
     oErr = options['oerr']
 
+    # The maximum characters that we will allow per row
+    max_chars_per_row = 80
+
     try:
         # Get the options
         lStyles = options['styles']
         sTarget = options['target']
+        sConvert = options['convert']
+        # One of the conversion options is 'interlinear'
+        bInterlinear = (sConvert == "interlinear" or sConvert == "i")
         # Get the input and the output file names
         sInput = options['input']
         sOutput = options['output']
@@ -57,13 +63,19 @@ def academic2phonemic(options):
                     # if needed change style name
                     if target:
                         run.style = target
+
         # Next visit all TABLES in the document
         iTbl = 0
+        table_list = []
         oErr.Status("Walking tables...")
         for tbl in doc.tables:
             iTbl += 1
             # Show where we are
             oErr.Status("  table #{}".format(iTbl), True)
+
+            # Find out how many columns there are
+
+
             # Visit all rows
             iRow = 0
             for row in tbl.rows:
@@ -97,6 +109,46 @@ def academic2phonemic(options):
                                     if target:
                                         run.style = target
 
+            # If we have the interlinearisation option set, then we need to perform that conversion
+            if bInterlinear and len(tbl.columns) == 2:
+                table_list.append(tbl)
+
+        # Now treat the first table
+        if len(table_list) > 0:
+            # Take the first table
+            tbl = table_list[0]
+
+            # Yes, interlinearisation: Walk the source
+            num_gloss = 0       # Characters in the gloss-line
+            num_morph = 0       # Characters in the morph-line
+            tblNew = None
+            for row in tbl.rows:
+                # Get the cells
+                cell_gloss = row.cells[0]
+                cell_morph = row.cells[1]
+                # Get text content
+                txt_gloss = cell_gloss.text
+                txt_morph = cell_morph.text
+                # Check counts
+                if num_gloss + len(txt_gloss) > max_chars_per_row or num_morph + len(txt_morph) > max_chars_per_row or tblNew == None:
+                    # Create a new table with two rows and zero columns
+                    tblNew = doc.add_table(2,0)
+                    tblNew.autofit = True
+                    oErr.Status("Added table. THe total tables = {}".format(len(doc.tables)))
+                    num_gloss = 0       # Characters in the gloss-line
+                    num_morph = 0       # Characters in the morph-line
+                # Add a column to the existing [tblNew]
+                colNew = tblNew.add_column(10)
+                # Copy cells
+                copy_table_cell(oErr, cell_gloss, colNew.cells[0])
+                copy_table_cell(oErr, cell_morph, colNew.cells[1])
+                # Adapt sizes
+                num_gloss += len(txt_gloss)
+                num_morph += len(txt_morph)
+
+            # Remove the original table
+            # doc.tables.remove(tbl)
+
 
         # Save the document under the new name
         doc.save(sOutput)
@@ -105,6 +157,25 @@ def academic2phonemic(options):
         return True
     except:
         oErr.DoError("academic2phonemic")
+        return False
+
+def copy_table_cell(oErr, cell_src, cell_dst):
+    """Copy the contents of a table cell from source to destination"""
+
+    try:
+        # Check the paragraphs in this cell
+        for par in cell_src.paragraphs:
+            # Add a paragraph to the destination
+            par_dst = cell_dst.add_paragraph(text=par.text)
+            # Copy the runs of this paragraph
+            for run in par.runs:
+                s = run.style.name
+                run_dst = par_dst.add_run(run.text)
+                run_dst.style = run.style
+        # Return positively
+        return True
+    except:
+        oErr.DoError("copy_table_cell")
         return False
 
 
@@ -135,8 +206,9 @@ def do_convert(sPart):
     sPart = re.sub(r"([aeiuoy])(')", r"\g<1>ʔ", sPart)
     # Treat [rh]
     sPart = sPart.replace("rh", "r̥")
-    # Treat [v]
-    sPart = re.sub(r"[Vv]", r"w",sPart)
+
+    # The [v] does NOT change!!!
+    
     # Make sure that ejectives have the correct apostrophe
     sPart = sPart.replace("'", "’")
     # Long vowels
@@ -148,6 +220,10 @@ def do_convert(sPart):
     sPart = sPart.replace("Yy", "üː").replace("yy", "üː")
     # Diphthong
     sPart = sPart.replace("Ye", "üe").replace("ye", "üe")
+    sPart = sPart.replace("Oe", "üe").replace("oe", "üe")   # So /ye/ and /oe/ coincide
+    sPart = sPart.replace("Ov", "ou").replace("ov", "ou")
+    sPart = sPart.replace("Ev", "eü").replace("ev", "eü")
+    sPart = sPart.replace("Av", "au").replace("av", "au")
     # SHort vowels
     sPart = sPart.replace("Y", "ü").replace("y", "ü")
     # Long consonants

@@ -15,7 +15,7 @@
     <InterpreterId>{635a10d7-ea0d-4f11-9219-167bcc6e3dc8}</InterpreterId>
     <InterpreterVersion>3.5</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>-i "d:/data files/publications/CaucasianHandbook/2017_CaucHbk-Chechen_version-07.docx" -o "d:/data files/publications/CaucasianHandbook/2017_CaucHbk-Chechen_converted-07.docx" -t PhonemicCaucHandbook</CommandLineArguments>
+    <CommandLineArguments>-i "d:/data files/publications/CaucasianHandbook/2017_CaucHbk-Chechen_converted-11.docx" -o "d:/data files/publications/CaucasianHandbook/2017_CaucHbk-Chechen_converted-11_conv.docx" -t PhonemicCaucHandbookItalic</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

@@ -28,6 +28,7 @@ def main(prgName, argv) :
                'output': '', 
                'styles': [],
                'target': '',
+               'convert': '',
                'oerr': errHandle}        
 
     try:
@@ -35,11 +36,11 @@ def main(prgName, argv) :
         index = prgName.rfind("\\")
         if (index > 0) :
             prgName = prgName[index+1:]
-        sSyntax = prgName + ' [-i <inputfile> -o <outputfile>'
+        sSyntax = prgName + ' [-s styles, -t target] -i <inputfile> -o <outputfile>'
         # get all the arguments
         try:
             # Get arguments and options
-            opts, args = getopt.getopt(argv, "hi:o:s:t:", ["-inputfile=","-outputfile=", "-styles=", "-target="])
+            opts, args = getopt.getopt(argv, "hi:o:s:t:c:", ["-inputfile=","-outputfile=", "-styles=", "-target=", "-convert="])
         except getopt.GetoptError:
             errHandle.DoError(sSyntax, True)
             
@@ -57,6 +58,8 @@ def main(prgName, argv) :
                 options['styles'] = re.split(r"\s*;\s*", arg)
             elif opt in ("-t", "--target"):
                 options['target'] = arg
+            elif opt in ("-c", "--convert"):
+                options['convert'] = arg
 
         # Check if all arguments are there
         if (options['input'] == '' or options['output'] == ''):
