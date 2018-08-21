@@ -29,6 +29,7 @@ def main(prgName, argv) :
                'styles': [],
                'target': '',
                'convert': '',
+               'switches': [],
                'oerr': errHandle}        
 
     try:
@@ -36,11 +37,11 @@ def main(prgName, argv) :
         index = prgName.rfind("\\")
         if (index > 0) :
             prgName = prgName[index+1:]
-        sSyntax = prgName + ' [-s styles, -t target] -i <inputfile> -o <outputfile>'
+        sSyntax = prgName + ' [-s styles, -t target, -w switches] -i <inputfile> -o <outputfile>'
         # get all the arguments
         try:
             # Get arguments and options
-            opts, args = getopt.getopt(argv, "hi:o:s:t:c:", ["-inputfile=","-outputfile=", "-styles=", "-target=", "-convert="])
+            opts, args = getopt.getopt(argv, "hi:o:s:t:c:w:", ["-inputfile=","-outputfile=", "-styles=", "-target=", "-convert=", "-switches="])
         except getopt.GetoptError:
             errHandle.DoError(sSyntax, True)
             
@@ -56,6 +57,9 @@ def main(prgName, argv) :
             elif opt in ("-s", "--styles"):
                 # Styles is a semicolon-separated list of styles
                 options['styles'] = re.split(r"\s*;\s*", arg)
+            elif opt in ("-w", "--switches"):
+                # Switches is a semicolon-separated list of switches
+                options['switches'] = re.split(r"\s*;\s*", arg)
             elif opt in ("-t", "--target"):
                 options['target'] = arg
             elif opt in ("-c", "--convert"):

@@ -50,14 +50,14 @@ def academic2phonemic(options):
             if par.style.name in lStyles:
                 oErr.Status("Convert par within document")
                 # Convert this part
-                t = do_convert(par.text)
+                t = do_convert(par.text, options)
                 # Replace it
                 par.text = t
             for run in par.runs:
                 s = run.style.name
                 if s in lStyles:
                     # Convert this part
-                    t = do_convert(run.text)
+                    t = do_convert(run.text, options)
                     # Replace it
                     run.text = t
                     # if needed change style name
@@ -95,14 +95,14 @@ def academic2phonemic(options):
                             if par.style.name in lStyles:
                                 oErr.Status("Convert par within table-cell")
                                 # Convert this part
-                                t = do_convert(par.text)
+                                t = do_convert(par.text, options)
                                 # Replace it
                                 par.text = t
                             for run in par.runs:
                                 s = run.style.name
                                 if s in lStyles:
                                     # Convert this part
-                                    t = do_convert(run.text)
+                                    t = do_convert(run.text, options)
                                     # Replace it
                                     run.text = t
                                     # if needed change style name
@@ -179,30 +179,59 @@ def copy_table_cell(oErr, cell_src, cell_dst):
         return False
 
 
-def do_convert(sPart):
+def do_convert(sPart, options=None):
     """Convert the string in [sPart] according to the rules for the Caucasian handbook"""
 
-    if "umar" in sPart:
-        iStop = 1
+    # Get the list of switches
+    switches = [] if not 'switches' in options else options['switches']
+    bGeminateV = ('vv' in switches)
+    bGeminateC = ('cc' in switches)
+    bIngush = ('ingush' in switches)
+    bHw = ('hw' in switches)
+    bGh = ('gh' in switches)
+
     # Treat the 'w' where it is a hw occurring after: c, ch, k, p, sh, s, t
     sPart = re.sub(r"(ch|c|k|p|sh|s|t)w", r"\g<1>ħ",sPart)
-    # Treat 'ww'
-    sPart = sPart.replace("ww", "ʕː")
-    # Convert gh > ʁ (long and short variant)
-    sPart = sPart.replace("ggh", "ʁː").replace("gh", "ʁ").replace("Gh", "ʁ")
-    # Convert ch > č (long and short variant)
-    sPart = sPart.replace("cch", "čː").replace("ch", "č").replace("Ch", "č")
-    # Convert zh > ž (long and short variant)
-    sPart = sPart.replace("zzh", "žː").replace("zh", "ž").replace("Zh", "ž")
-    # Convert sh > š (long and short variant)
-    sPart = sPart.replace("ssh", "šː").replace("sh", "š").replace("Sh", "š")
-    # Convert hw > ħ (long and short variant)
-    sPart = sPart.replace("hhw", "ħː").replace("hw", "ħ").replace("Hw", "ħ")
+
+    if bGeminateC:
+        # Treat 'ww'
+        sPart = sPart.replace("ww", "ʕʕ")
+        if not bGh:
+            # Convert gh > ʁ (long and short variant)
+            sPart = sPart.replace("ggh", "ʁː").replace("gh", "ʁ").replace("Gh", "ʁ")
+        # Convert ch > č (long and short variant)
+        sPart = sPart.replace("cch", "čč").replace("ch", "č").replace("Ch", "č")
+        # Convert zh > ž (long and short variant)
+        sPart = sPart.replace("zzh", "žž").replace("zh", "ž").replace("Zh", "ž")
+        # Convert sh > š (long and short variant)
+        sPart = sPart.replace("ssh", "šš").replace("sh", "š").replace("Sh", "š")
+        if not bHw:
+            # Convert hw > ħ (long and short variant)
+            sPart = sPart.replace("hhw", "ħħ").replace("hw", "ħ").replace("Hw", "ħ")
+    else:
+        # Treat 'ww'
+        sPart = sPart.replace("ww", "ʕː")
+        if not bGh:
+            # Convert gh > ʁ (long and short variant)
+            sPart = sPart.replace("ggh", "ʁː").replace("gh", "ʁ").replace("Gh", "ʁ")
+        # Convert ch > č (long and short variant)
+        sPart = sPart.replace("cch", "čː").replace("ch", "č").replace("Ch", "č")
+        # Convert zh > ž (long and short variant)
+        sPart = sPart.replace("zzh", "žː").replace("zh", "ž").replace("Zh", "ž")
+        # Convert sh > š (long and short variant)
+        sPart = sPart.replace("ssh", "šː").replace("sh", "š").replace("Sh", "š")
+        if not bHw:
+            # Convert hw > ħ (long and short variant)
+            sPart = sPart.replace("hhw", "ħː").replace("hw", "ħ").replace("Hw", "ħ")
     # Treat the 'w' where it occurs in other places
     sPart = re.sub(r"[Ww]", r"ʕ",sPart)
     # Treat double glottal stop
-    sPart = sPart.replace("''", "ʔː")
-    sPart = sPart.replace("’’", "ʔː")
+    if bGeminateC:
+        sPart = sPart.replace("''", "ʔʔ")
+        sPart = sPart.replace("’’", "ʔʔ")
+    else:
+        sPart = sPart.replace("''", "ʔː")
+        sPart = sPart.replace("’’", "ʔː")
     # Treat single glottal stop
     sPart = re.sub(r"([aeiuoy])(['’])", r"\g<1>ʔ", sPart)
     # Treat [rh]
@@ -212,13 +241,18 @@ def do_convert(sPart):
     
     # Make sure that ejectives have the correct apostrophe
     sPart = sPart.replace("'", "’")
-    # Long vowels
-    sPart = sPart.replace("Aa", "aː").replace("aa", "aː")
-    sPart = sPart.replace("Ee", "eː").replace("ee", "eː")
-    sPart = sPart.replace("Ii", "iː").replace("ii", "iː")
-    sPart = sPart.replace("Oo", "oː").replace("oo", "oː")
-    sPart = sPart.replace("Uu", "uː").replace("uu", "uː")
-    sPart = sPart.replace("Yy", "üː").replace("yy", "üː")
+    if bGeminateV:
+        if not bIngush:
+            sPart = sPart.replace("Yy", "üː").replace("yy", "üː")
+    else:
+        # Long vowels
+        sPart = sPart.replace("Aa", "aː").replace("aa", "aː")
+        sPart = sPart.replace("Ee", "eː").replace("ee", "eː")
+        sPart = sPart.replace("Ii", "iː").replace("ii", "iː")
+        sPart = sPart.replace("Oo", "oː").replace("oo", "oː")
+        sPart = sPart.replace("Uu", "uː").replace("uu", "uː")
+        if not bIngush:
+            sPart = sPart.replace("Yy", "üː").replace("yy", "üː")
     # Diphthong
     sPart = sPart.replace("Ye", "üe").replace("ye", "üe")
     sPart = sPart.replace("Oe", "üe").replace("oe", "üe")   # So /ye/ and /oe/ coincide
@@ -226,14 +260,16 @@ def do_convert(sPart):
     sPart = sPart.replace("Ev", "eü").replace("ev", "eü")
     sPart = sPart.replace("Av", "au").replace("av", "au")
     # SHort vowels
-    sPart = sPart.replace("Y", "ü").replace("y", "ü")
+    if not bIngush:
+        sPart = sPart.replace("Y", "ü").replace("y", "ü")
     # Long consonants
-    sPart = sPart.replace("bb", "bː").replace("dd", "dː").replace("gg", "gː")
-    sPart = sPart.replace("hh", "hː").replace("kk", "kː").replace("ll", "lː")
-    sPart = sPart.replace("mm", "mː").replace("nn", "nː").replace("pp", "pː")
-    sPart = sPart.replace("qq", "qː").replace("rr", "rː").replace("ss", "sː")
-    sPart = sPart.replace("tt", "tː").replace("vv", "vː").replace("xx", "xː")
-    sPart = sPart.replace("zz", "zː")
+    if not bGeminateC:
+        sPart = sPart.replace("bb", "bː").replace("dd", "dː").replace("gg", "gː")
+        sPart = sPart.replace("hh", "hː").replace("kk", "kː").replace("ll", "lː")
+        sPart = sPart.replace("mm", "mː").replace("nn", "nː").replace("pp", "pː")
+        sPart = sPart.replace("qq", "qː").replace("rr", "rː").replace("ss", "sː")
+        sPart = sPart.replace("tt", "tː").replace("vv", "vː").replace("xx", "xː")
+        sPart = sPart.replace("zz", "zː")
 
     # Return what we have made of it
     return sPart
