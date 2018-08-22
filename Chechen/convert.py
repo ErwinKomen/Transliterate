@@ -189,6 +189,7 @@ def do_convert(sPart, options=None):
     bIngush = ('ingush' in switches)
     bHw = ('hw' in switches)
     bGh = ('gh' in switches)
+    bOld = False
 
     # Treat the 'w' where it is a hw occurring after: c, ch, k, p, sh, s, t
     sPart = re.sub(r"(ch|c|k|p|sh|s|t)w", r"\g<1>ħ",sPart)
@@ -254,11 +255,24 @@ def do_convert(sPart, options=None):
         if not bIngush:
             sPart = sPart.replace("Yy", "üː").replace("yy", "üː")
     # Diphthong
-    sPart = sPart.replace("Ye", "üe").replace("ye", "üe")
-    sPart = sPart.replace("Oe", "üe").replace("oe", "üe")   # So /ye/ and /oe/ coincide
-    sPart = sPart.replace("Ov", "ou").replace("ov", "ou")
-    sPart = sPart.replace("Ev", "eü").replace("ev", "eü")
-    sPart = sPart.replace("Av", "au").replace("av", "au")
+    if bOld:
+        sPart = sPart.replace("Ye", "üe").replace("ye", "üe")
+        sPart = sPart.replace("Oe", "üe").replace("oe", "üe")   # So /ye/ and /oe/ coincide
+        sPart = sPart.replace("Ov", "ou").replace("ov", "ou")
+        sPart = sPart.replace("Ev", "eü").replace("ev", "eü")
+        sPart = sPart.replace("Av", "au").replace("av", "au")
+    else:
+        sPart = re.sub(r"Ye(?:^[aeiouy])", r"üe", sPart)
+        sPart = re.sub(r"Oe(?:^[aeiouy])", r"üe", sPart)
+        sPart = re.sub(r"Ov(?:^[aeiouy])", r"ou", sPart)
+        sPart = re.sub(r"Ev(?:^[aeiouy])", r"eü", sPart)
+        sPart = re.sub(r"Av(?:^[aeiouy])", r"au", sPart)
+        sPart = re.sub(r"ye(?:^[aeiouy])", r"üe", sPart)
+        sPart = re.sub(r"oe(?:^[aeiouy])", r"üe", sPart)
+        sPart = re.sub(r"ov(?:^[aeiouy])", r"ou", sPart)
+        sPart = re.sub(r"ev(?:^[aeiouy])", r"eü", sPart)
+        sPart = re.sub(r"av(?:^[aeiouy])", r"au", sPart)
+        pass
     # SHort vowels
     if not bIngush:
         sPart = sPart.replace("Y", "ü").replace("y", "ü")
