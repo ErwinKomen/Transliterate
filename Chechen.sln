@@ -9,6 +9,8 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Lezgi", "Lezgi\Lezgi.pyproj
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SplitText", "SplitText\SplitText.pyproj", "{9F8CAB31-FF1B-4031-A0AC-3B1912D47FD7}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SfmTools", "SfmTools\SfmTools.pyproj", "{2F7C20B6-4A73-42BD-962E-D3FB5541BF0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,8 @@ Global
 		{92BF1273-A065-4CEE-9AB0-D2152932B132}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F8CAB31-FF1B-4031-A0AC-3B1912D47FD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9F8CAB31-FF1B-4031-A0AC-3B1912D47FD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F7C20B6-4A73-42BD-962E-D3FB5541BF0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F7C20B6-4A73-42BD-962E-D3FB5541BF0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
