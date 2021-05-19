@@ -8,6 +8,8 @@
 import util
 import re
 from docx import Document
+from latcyr import TranslitChe
+
 
 def academic2phonemic(options):
     """COnvert the file in options"""
@@ -28,9 +30,13 @@ def academic2phonemic(options):
         sConvert = options['convert']
         # One of the conversion options is 'interlinear'
         bInterlinear = (sConvert == "interlinear" or sConvert == "i")
+        add = options.get("add")
         # Get the input and the output file names
         sInput = options['input']
         sOutput = options['output']
+
+        # Initialize a transliterate object
+        translit = TranslitChe()
 
         # Create a document object
         doc = Document(sInput)
@@ -51,6 +57,9 @@ def academic2phonemic(options):
                 oErr.Status("Convert par within document")
                 # Convert this part
                 t = do_convert(par.text, options)
+                if add == "cyrillic":
+                    t_c = translit.do_lat2cyr(par.text, options)
+                    t = t + "\n" + t_c
                 # Replace it
                 par.text = t
             for run in par.runs:
@@ -58,6 +67,9 @@ def academic2phonemic(options):
                 if s in lStyles:
                     # Convert this part
                     t = do_convert(run.text, options)
+                    if add == "cyrillic":
+                        t_c = translit.do_lat2cyr(par.text, options)
+                        t = t + "\n" + t_c
                     # Replace it
                     run.text = t
                     # if needed change style name
@@ -96,6 +108,9 @@ def academic2phonemic(options):
                                 oErr.Status("Convert par within table-cell")
                                 # Convert this part
                                 t = do_convert(par.text, options)
+                                if add == "cyrillic":
+                                    t_c = translit.do_lat2cyr(par.text, options)
+                                    t = t + "\n" + t_c
                                 # Replace it
                                 par.text = t
                             for run in par.runs:
@@ -103,6 +118,9 @@ def academic2phonemic(options):
                                 if s in lStyles:
                                     # Convert this part
                                     t = do_convert(run.text, options)
+                                    if add == "cyrillic":
+                                        t_c = translit.do_lat2cyr(par.text, options)
+                                        t = t + "\n" + t_c
                                     # Replace it
                                     run.text = t
                                     # if needed change style name
@@ -287,4 +305,4 @@ def do_convert(sPart, options=None):
 
     # Return what we have made of it
     return sPart
-    
+ 

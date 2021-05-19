@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>6860b35b-6d51-4aa6-8205-b5b2054699c0</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>convert.py</StartupFile>
+    <StartupFile>Chechen.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -15,7 +15,7 @@
     <InterpreterId>{7c896e65-00f1-457e-b5b8-04fb4a19f42e}</InterpreterId>
     <InterpreterVersion>3.5</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>-i "d:/data files/publications/HandbookCheIng/data/Examples-vern.docx" -o "d:/data files/publications/HandbookCheIng/data/Examples-conv.docx" -t PhonemicCaucHandbookItalic</CommandLineArguments>
+    <CommandLineArguments>-i "d:/data files/Cache/Literacy/ChechenLanguageStudies/Gulam/Gulam_version01.docx" -o "d:/data files/Cache/Literacy/ChechenLanguageStudies/Gulam/Gulam_version01b.docx" -s ChechenLatin -t Vernacular -a cyrillic -v macron</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -29,6 +29,9 @@
   <ItemGroup>
     <Compile Include="Chechen.py" />
     <Compile Include="convert.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="latcyr.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="util.py">

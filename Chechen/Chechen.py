@@ -23,12 +23,14 @@ def main(prgName, argv) :
     flOutput = ''       # output file name
     lStyleIn = []       # List of styles to watch
     sStyleOut = ""      # THe one output style needed
+    bCyrillic = False   # Add cyrillic line
                         # The parameters we pass on
     options = {'input': '', 
                'output': '', 
                'styles': [],
                'target': '',
                'convert': '',
+               'cyrillic': bCyrillic,
                'switches': [],
                'oerr': errHandle}        
 
@@ -37,11 +39,12 @@ def main(prgName, argv) :
         index = prgName.rfind("\\")
         if (index > 0) :
             prgName = prgName[index+1:]
-        sSyntax = prgName + ' [-s styles, -t target, -w switches] -i <inputfile> -o <outputfile>'
+        sSyntax = prgName + ' [-s styles, -t target, -w switches, -c arg, -a cyrillic -v macron] -i <inputfile> -o <outputfile>'
         # get all the arguments
         try:
             # Get arguments and options
-            opts, args = getopt.getopt(argv, "hi:o:s:t:c:w:", ["-inputfile=","-outputfile=", "-styles=", "-target=", "-convert=", "-switches="])
+            opts, args = getopt.getopt(argv, "hi:o:s:t:c:w:a:v:", 
+                ["-inputfile=","-outputfile=", "-styles=", "-target=", "-convert=", "-switches=", "-add=", "-vowel="])
         except getopt.GetoptError:
             errHandle.DoError(sSyntax, True)
             
@@ -62,8 +65,12 @@ def main(prgName, argv) :
                 options['switches'] = re.split(r"\s*;\s*", arg)
             elif opt in ("-t", "--target"):
                 options['target'] = arg
+            elif opt in ("-v", "--vowel"):
+                options['vowel'] = arg
             elif opt in ("-c", "--convert"):
                 options['convert'] = arg
+            elif opt in ("-a", "--add"):
+                options['add'] = arg
 
         # Check if all arguments are there
         if (options['input'] == '' or options['output'] == ''):

@@ -37,11 +37,6 @@ digraphs = {"гъ": "ğ", "гь": "h", "къ": "g'", "кь": "q'", "кI": "k'",
 # chars that need to be included without changing
 nonalphanum = ('"', ',', '-', '?', '!', ':', '.', '(', ')', '[', ']', ' ', '\n')
 # files with cyrillic orthography
-#Cyr_files = ['Text1.txt', 'Text2.txt', 'Text3.txt', 'Text6.txt',
-#    'Text7.txt', 'Text10.txt', 'Text12.txt', 'Text13.txt',
-#    'Text14.txt', 'Text15.txt', 'Text17.txt', 'Text18.txt',
-#    'Text19.txt', 'Text20.txt', 'Text25.txt', 'Text26.txt',
-#    'Text28.txt']
 Cyr_files = ['Text1.txt']
 # list of finite verbal inflection endings and full copula forms; transliterated
 Vendings = ["ray(ni)?(t’a)?\\b", "za?vay?(ç|çir)?(ni)?(t’a)?\\b",
