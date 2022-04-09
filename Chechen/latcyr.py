@@ -33,17 +33,22 @@ lst_latin_c = [
     "tw_CC_тхь", "t'_C_тІ", "t_C_т",
     "v_C_в",
     "w_C_І",
-    "xhw_CC_хъхь", "xw_CC_хъхь", "x_CC_х",
+    "xhw_CC_хъхь", "xw_CC_хъхь", "x_C_х",
     "zzh_CC_жж", "zhw_CC_жІ", "zw_CC_зхь", "zh_C_ж", "z_C_з",
+    "''_CC_ъ", "'_C_"
     ]
-any_vowel = "aeiouy"
+vowel_lat = "aeiouy"
+
+lat_upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+# Note the order: start / mid / after 'j'
 lst_latin_vs = [
-    "aa_VV", "ae_V", "a_V", 
-    "ee_VV", "eE_VV", "e_V", 
-    "ie_D", "ii_VV", "i_V", 
-    "oo_VV", "oe_D", "o_V",
-    "uo_D", "uu_VV", "u_V",
-    "yy_VV", "ye_D", "y_V"
+    "aa_VV_а_а_я",    "ae_V_аь_аь_яь",     "a_V_а_а_я", 
+    "ee_VV_э_е_е",    "eE_VV_э̄_ē_ē",       "e_V_э_е_е", 
+    "ie_D_иэ_иэ_йиэ", "ii_VV_ий_ий_йий",   "i_V_и_и_йи", 
+    "oo_VV_о_о_йо",   "oe_D_оь_оь_йоь",    "o_V_о_о_йо",
+    "uo_D_о_о_йо",    "uu_VV_у_у_ю",       "u_V_у_у_ю",
+    "yy_VV_у_у_ю",    "ye_D_оь_оь_йоь",    "y_V_уь_уь_юь"
     ]
 lst_latin_v = [
     "aa_VV_а_ā", "aj'ie_VCD_айе", "ae_V_аь", "a_V_а_а",
@@ -116,10 +121,39 @@ class ErrHandle:
 
 
 class TranslitChe(object):
+    is_latin = re.compile(r"[a-zA-Z']")
     lst_trans_c = []
     lst_trans_v = []
-    lst_trans_vs = []
-    is_latin = re.compile(r"[a-zA-Z']")
+    diphthongs_full = False
+    vowels_macron = False
+    # All vowels...
+    # - cyr     = normal cyrillic rendering
+    # - open    = open syllable with macron rendering
+    # - j       = after syllable-starting 'j'
+    # - open_j  = open j-starting syllable with macron rendering
+    # - g       = after syllable-starting glottal stop
+    # - open_g  = open glottal-stop-starting syllable with macron rendering
+    # - dip     = diphthong rendering *only in open syllables*
+    lst_trans_vs = [
+        {'lat': 'aa', 'syl': 'VV', 'cyr': 'а',  'open': 'ā', 'j': 'я', 'open_j': 'я̄'},
+        {'lat': 'ae', 'syl': 'V',  'cyr': 'аь',              'j': 'яь'              },
+        {'lat': 'a',  'syl': 'V',  'cyr': 'а',               'j': 'я'               },
+        {'lat': 'ee', 'syl': 'VV', 'cyr': 'е',  'open': 'ē', 'g': 'э', 'open_g': 'э̄'},
+        {'lat': 'eE', 'syl': 'VV', 'cyr': 'ē',               'g': 'э̄'               },
+        {'lat': 'e',  'syl': 'V',  'cyr': 'е',               'g': 'э'               },
+        {'lat': 'ie', 'syl': 'D',  'cyr': 'е',  'dip': 'иэ', 'g': 'э'               },
+        {'lat': 'ii', 'syl': 'VV', 'cyr': 'ий'                                      },
+        {'lat': 'i',  'syl': 'V',  'cyr': 'и'                                       },
+        {'lat': 'oo', 'syl': 'VV', 'cyr': 'о',  'open': 'ō'                         },
+        {'lat': 'oe', 'syl': 'D',  'cyr': 'оь'                                      },
+        {'lat': 'o',  'syl': 'V',  'cyr': 'о'                                       },
+        {'lat': 'uo', 'syl': 'D',  'cyr': 'о',  'dip': 'уо'                         },
+        {'lat': 'uu', 'syl': 'VV', 'cyr': 'у',  'open': 'ȳ', 'j': 'ю', 'open_j': 'ю̄'},
+        {'lat': 'u',  'syl': 'V',  'cyr': 'у',               'j': 'ю'               },
+        {'lat': 'yy', 'syl': 'VV', 'cyr': 'уьй',             'j': 'юьй'             },
+        {'lat': 'ye', 'syl': 'D',  'cyr': 'оь'                                      },
+        {'lat': 'y',  'syl': 'V',  'cyr': 'уь',              'j': 'юь'              },
+        ]
     oErr = ErrHandle()
 
     def __init__(self, **kwargs):
@@ -129,25 +163,25 @@ class TranslitChe(object):
             oItem = dict(lat=arItem[0], syl=arItem[1], cyr=arItem[2])
             self.lst_trans_c.append(oItem)
 
-        # Read the list of skip vowels into my own list
-        for item in lst_latin_vs:
-            arItem = item.split("_")
-            oItem = dict(lat=arItem[0], syl=arItem[1])
-            self.lst_trans_vs.append(oItem)
+        ## Read the list of skip vowels into my own list
+        #for item in lst_latin_vs:
+        #    arItem = item.split("_")
+        #    oItem = dict(lat=arItem[0], syl=arItem[1])
+        #    self.lst_trans_vs.append(oItem)
 
-        # Read the list of VOWELS into my own list
-        for item in lst_latin_v:
-            arItem = item.split("_")
-            oItem = dict(lat=arItem[0], syl=arItem[1], cyr=arItem[2],
-                         cyr_open=None, cyr_ini=None, cyr_ini_open=None)
-            num = len(arItem)
-            if num > 3:
-                oItem['cyr_open'] = arItem[3]
-            if num > 4:
-                oItem['cyr_ini'] = arItem[4]
-            if num > 5:
-                oItem['cyr_ini_open'] = arItem[5]
-            self.lst_trans_v.append(oItem)
+        ## Read the list of VOWELS into my own list
+        #for item in lst_latin_v:
+        #    arItem = item.split("_")
+        #    oItem = dict(lat=arItem[0], syl=arItem[1], cyr=arItem[2],
+        #                 cyr_open=None, cyr_ini=None, cyr_ini_open=None)
+        #    num = len(arItem)
+        #    if num > 3:
+        #        oItem['cyr_open'] = arItem[3]
+        #    if num > 4:
+        #        oItem['cyr_ini'] = arItem[4]
+        #    if num > 5:
+        #        oItem['cyr_ini_open'] = arItem[5]
+        #    self.lst_trans_v.append(oItem)
 
         # Make sure to also do what belongs to this object
         return super(TranslitChe, self).__init__(**kwargs)
@@ -156,9 +190,8 @@ class TranslitChe(object):
         """Perform conversion latin to cyrillic on ONE WORD only"""
 
         def skip_vowel(jPos, sText):
-            for item in lst_trans_vs:
+            for item in self.lst_trans_vs:
                 sLat = item['lat']
-                sSyl = item['syl']
                 lenItem = len(sLat)
                 if sText[jPos:jPos+lenItem] == sLat:
                     # Found it!
@@ -166,24 +199,152 @@ class TranslitChe(object):
             # DIdn't find it
             return jPos, None
 
+        def get_cons(jPos, sText):
+            """Get one consonant (cluster)"""
+
+            for item in self.lst_trans_c:
+                sLat = item.get('lat')
+                lenItem = len(sLat)
+                if sText[jPos:jPos+lenItem] == sLat:
+                    # Found it!
+                    return jPos + lenItem, item
+            # DIdn't find it
+            return jPos, None
+
+        def get_syl_type(prec_env, syl_this, foll_env, foll_foll_env):
+            """Determine the syllable type"""
+
+            sType = "any"
+            if syl_this in ['VV', 'D']:
+                if foll_env in ['#', 'CC'] or foll_env == "C" and foll_foll_env in ['#', 'C', 'CC'] :
+                    sType = "close"
+                else:
+                    sType = "open"
+            return sType
+
+        def get_g_start(prec_env, prec_letter):
+            """Determine whether the syllable starts with a glottal stop"""
+            bResult = False
+            if prec_env == "#" or prec_letter == "'":
+                bResult = True
+            return bResult
+
+        def capital_type(sWord):
+            """Determine the kind of capitalization: none, first, whole"""
+
+            lenWord = len(sWord)
+            bFirst = (sWord[0] in lat_upper)
+            if not bFirst:
+                result = "none"
+            else:
+                result = "first"
+                capCount = 1
+                for char in sWord[1:]:
+                    if char in lat_upper: capCount += 1
+                    if capCount >= 2:
+                        result = whole
+                        break
+            return result
+
         sBack = ""
         lWord = []
         iPos = 0
         num = len(sWord)
+        lBack = []    # The transliterated word we are sending back
         try:
+            # Determine the capital type
+            capitalization = capital_type(sWord)
+            # Now take the lower-case variant
+            sWord = sWord.lower()
             # Walk the whole word
             while iPos < num:
                 # Skip any vowels
-                if sWord[iPos:1] in any_vowel:
+                if sWord[iPos] in vowel_lat:
                     iPos, oVowel = skip_vowel(iPos, sWord)
                     if oVowel == None:
                         # Something went wrong
                         iStop = 1
                     else:
                         lWord.append(oVowel)
+                else:
+                    # This is a consonant: find it
+                    iPos, oCons = get_cons(iPos, sWord)
+                    if oCons == None:
+                        # Something went wrong
+                        iStop = 1
+                    else:
+                        lWord.append(oCons)
+            ## Adapt the syllable of the last one
+            #lWord[-1]['syl'] += "#"
 
-                # GO to the next position
-                iPos += 1
+            # Second pass: perform the translation into cyrillic
+            prec_env = "#"
+            prec_letter = ""
+            word_len = len(lWord)
+            for idx, oLetter in enumerate(lWord):
+                # Make sure we have the complete environment
+                syl_this = oLetter['syl']
+                foll_env = "#" if idx >= word_len-1 else lWord[idx+1]['syl']
+                foll_foll_env = "#" if idx >= word_len-2 else lWord[idx+2]['syl']
+
+                # Determine the syllable type: open or closed
+                syl_type = get_syl_type(prec_env, syl_this, foll_env, foll_foll_env)
+
+                # Start with a simple case
+                if oLetter['syl'] in ['C', 'CC']:
+                    # Just produce the cyrillic output
+                    lBack.append(oLetter['cyr'])
+                elif oLetter['syl'] == "D":
+                    # Diphthong...
+                    if self.diphthongs_full and 'dip' in oLetter and syl_type == "open":
+                        lBack.append(oLetter['dip'])
+                    elif 'g' in oLetter and get_g_start(prec_env, prec_letter):
+                        lBack.append(oLetter['g'])
+                    else:
+                        lBack.append(oLetter['cyr'])
+                elif oLetter['syl'] == "V":
+                    # Short vowel...
+                    if prec_letter == "j" and 'j' in oLetter:
+                        # Replace with preceding variant
+                        lBack[-1] = oLetter['j']
+                    elif 'g' in oLetter and get_g_start(prec_env, prec_letter):
+                        # Use the glottal-start variant
+                        lBack.append(oLetter['g'])
+                    else:
+                        lBack.append(oLetter['cyr'])
+                elif oLetter['syl'] == "VV":
+                    # Long vowel
+                    if self.vowels_macron and 'open' in oLetter and syl_type == "open":
+                        if prec_letter == "j" and 'open_j' in oLetter:
+                            # Replace with preceding variant
+                            lBack[-1] = oLetter['open_j']
+                        elif 'open_g' in oLetter and get_g_start(prec_env, prec_letter):
+                            # Use the glottal-start variant
+                            lBack.append(oLetter['open_g'])
+                        else:
+                            lBack.append(oLetter['open'])
+                    elif prec_letter == "j" and 'j' in oLetter:
+                        # Replace with preceding variant
+                        lBack[-1] = oLetter['j']
+                    elif 'g' in oLetter and get_g_start(prec_env, prec_letter):
+                        # Use the glottal-start variant
+                        lBack.append(oLetter['g'])
+                    else:
+                        lBack.append(oLetter['cyr'])
+                else:
+                    # Cannot happen
+                    self.oErr.Status("lat2cyr_word: unknown syllable type {}".format(oLetter['syl']))
+
+                # Adapt the prec_env (preceding environment) and the prec_letter (preceding letter)
+                prec_env = syl_this
+                prec_letter = oLetter['lat']
+            # COmbine
+            sBack = "".join(lBack)
+            # Possibly apply capitalization
+            if capitalization == "first":
+                sBack = sBack[0].capitalize() + sBack[1:]
+            elif capitalization == "whole":
+                sBack = sBack.capitalize()
         except:
             msg = self.oErr.get_error_message()
             self.oErr.DoError("lat2cyr_word")
@@ -195,7 +356,8 @@ class TranslitChe(object):
 
         # Get the list of switches
         switches = [] if not 'switches' in options else options['switches']
-        bOverbar = (options.get("vowel") == "macron")
+        self.diphthongs_full = (options.get("diphthong") == "full") 
+        self.vowels_macron = (options.get("vowel") == "macron")
         
         # Initialize
         bCons = True        # Start of word is with a consonant (if anything, then glottal stop by default)
@@ -208,7 +370,7 @@ class TranslitChe(object):
         try:
 
             # Divide the string into words
-            while iPos < iLen-1:
+            while iPos < iLen:
                 # Are we starting a word or not?
                 sThis = sPart[iPos]
                 bThisWord = (self.is_latin.match(sThis) != None)

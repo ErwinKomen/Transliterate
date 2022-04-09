@@ -64,7 +64,10 @@ def main(prgName, argv) :
                 # Switches is a semicolon-separated list of switches
                 options['switches'] = re.split(r"\s*;\s*", arg)
             elif opt in ("-t", "--target"):
-                options['target'] = arg
+                arArg = arg.split(";")
+                options['target'] = arArg[0]
+                if len(arArg)>1:
+                    options['target_cyrillic'] = arArg[1]
             elif opt in ("-v", "--vowel"):
                 options['vowel'] = arg
             elif opt in ("-c", "--convert"):

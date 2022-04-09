@@ -7,6 +7,7 @@
 
 import util
 import re
+import copy
 from docx import Document
 from latcyr import TranslitChe
 
@@ -27,10 +28,13 @@ def academic2phonemic(options):
         # Get the options
         lStyles = options['styles']
         sTarget = options['target']
+        sTargetCyrillic = options.get("target_cyrillic")
         sConvert = options['convert']
         # One of the conversion options is 'interlinear'
         bInterlinear = (sConvert == "interlinear" or sConvert == "i")
         add = options.get("add")
+        if add == "cyrillic" and sTargetCyrillic == None:
+            sTargtCyrillic = "Cyrillic"
         # Get the input and the output file names
         sInput = options['input']
         sOutput = options['output']
@@ -44,6 +48,7 @@ def academic2phonemic(options):
         styles = doc.styles
         # Get target style
         target = next((item for item in styles if item.name == sTarget), None )
+        target_cyrillic = next((item for item in styles if item.name == sTargetCyrillic), None )
         
         iPar = 0
         # Walk through all the paragraphs of the document
@@ -62,19 +67,30 @@ def academic2phonemic(options):
                     t = t + "\n" + t_c
                 # Replace it
                 par.text = t
-            for run in par.runs:
-                s = run.style.name
-                if s in lStyles:
-                    # Convert this part
-                    t = do_convert(run.text, options)
-                    if add == "cyrillic":
-                        t_c = translit.do_lat2cyr(par.text, options)
-                        t = t + "\n" + t_c
-                    # Replace it
-                    run.text = t
-                    # if needed change style name
-                    if target:
-                        run.style = target
+                x = par.style
+            if len(par.runs) > 0:
+                old_runs = copy.copy(par.runs)
+                par.clear()
+                for run in old_runs:
+                    s = run.style.name
+                    if s in lStyles:
+                        # Convert this part
+                        t = do_convert(run.text, options)
+                        if add == "cyrillic":
+                            t_c = translit.do_lat2cyr(run.text, options)
+                            # t = t_c + "\n" + t
+                        # Replace it
+                        run.text = t
+                        # if needed change style name
+                        if target:
+                            run.style = target
+                        if add == "cyrillic":
+                            # Create a new run
+                            par.add_run(t_c + "\n" , target_cyrillic)
+                        # Simply add the run in the targt style
+                        par.add_run(run.text, target)
+                    else:
+                        par.add_run(run.text, run.style)
 
         # Next visit all TABLES in the document
         iTbl = 0
@@ -207,6 +223,7 @@ def do_convert(sPart, options=None):
     bIngush = ('ingush' in switches)
     bHw = ('hw' in switches)
     bGh = ('gh' in switches)
+    bIpa = ('ipa' in switches)
     bOld = False
 
     # Treat the 'w' where it is a hw occurring after: c, ch, k, p, sh, s, t
@@ -302,6 +319,14 @@ def do_convert(sPart, options=None):
         sPart = sPart.replace("qq", "qː").replace("rr", "rː").replace("ss", "sː")
         sPart = sPart.replace("tt", "tː").replace("vv", "vː").replace("xx", "xː")
         sPart = sPart.replace("zz", "zː")
+
+    # Should we do IPA?
+    if bIpa:
+        sPart = sPart.replace("ü", "y")
+        sPart = sPart.replace("š", "ʃ")
+        sPart = sPart.replace("ž", "ʒ")
+        sPart = sPart.replace("č", "ʧ")
+        sPart = sPart.replace("c", "ʦ")
 
     # Return what we have made of it
     return sPart
